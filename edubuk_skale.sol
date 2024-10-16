@@ -15,7 +15,7 @@ contract Edubukesealer {
     struct Cert {
         Institute institute;
         string studentname;
-        address studentAdd; 
+        address studentAdd; // added on 4th sept
         string certHash;
         string certType;
         string certURI;
@@ -56,7 +56,7 @@ contract Edubukesealer {
 
     mapping(bytes32 => Cert) private certificates;
 
-    mapping(uint256 => Institute) private institutes; 
+    mapping(uint256 => Institute) private institutes; //address to institute
 
     mapping(uint256 => address[]) private instituteWitnesses;
 
@@ -97,9 +97,9 @@ contract Edubukesealer {
 
     event instituteWitnessUpdated(uint256 id, address witness);
 
-    event InstituteRevoked(uint256 id, address instituteAddress); 
+    event InstituteRevoked(uint256 id, address instituteAddress); // added
 
-    event BulkUploadFailed(string[] failedHashes, uint256 count); 
+    event BulkUploadFailed(string[] failedHashes, uint256 count); // added
 
     ///////////////// CONSTRUCTOR /////////////////////////////////////////////////////////////////////////
 
@@ -135,6 +135,7 @@ contract Edubukesealer {
         string memory _ackronynm,
         address _witness
     ) external OnlyContractOwner {
+        //  require(institutes[InstituteID].id == 0, "Issuer already registered");
         require(!registeredInstitute[_witness], "Witness not registered");
         institutes[InstituteID].instituteName = _instituteName;
         institutes[InstituteID].ackronym = _ackronynm;
@@ -156,6 +157,7 @@ contract Edubukesealer {
     }
 
     // This Function is used to Update the Witness
+
     function UpdateWitness(address _newwitness) external {
         uint256 id = institute_ID[msg.sender];
         require(
@@ -194,6 +196,10 @@ contract Edubukesealer {
         // Remove the institute from the mappings
         uint256 id = institute_ID[_institute];
         delete institutes[id];
+        // delete instituteWitnesses[id];
+        // delete institute_ID[_institute];
+
+        // Remove institute from registeredInstitute mapping
         registeredInstitute[_institute] = false;
 
         // Emit event
@@ -201,6 +207,7 @@ contract Edubukesealer {
     }
 
     // string to bytes32 conversion
+
     function stringToBytes32(
         string memory source
     ) private pure returns (bytes32 result) {
@@ -224,6 +231,7 @@ contract Edubukesealer {
     }
 
     // This function is used to post certificate
+
     function postCertificate(
         string memory _studentname,
         address _studentAdd,
@@ -276,8 +284,8 @@ contract Edubukesealer {
         emit CertificatePosted(_hash, id, _studentname, _issuerName);
     }
 
-
     // This function is used for bulk upload
+
     function bulkUpload(
         bulkuploaddata[] memory data,
         string memory _issuerName
@@ -315,6 +323,7 @@ contract Edubukesealer {
             );
             uint256 len = studentInfo[data[i].studentAdd].instituteName.length;
             studentInfo[data[i].studentAdd].uri.push(data[i].URI);
+            studentInfo[data[i].studentAdd].name = data[i].studentname;
             // Only add if it's a new institute for the student
             if (
                 len == 0 ||
@@ -378,6 +387,7 @@ contract Edubukesealer {
     }
 
     // This function is used to verify certificate with data
+
     function Viewcertificatedata(
         string memory _hash
     )
@@ -412,6 +422,7 @@ contract Edubukesealer {
     }
 
     // This function is used to verify Institute
+
     function verifyInstitute()
         external
         view
@@ -431,6 +442,7 @@ contract Edubukesealer {
     }
 
     // This function is used to verify contract owner
+
     function verifyContractOwner() external view returns (bool) {
         if (msg.sender == Contractowner) {
             return true;
@@ -440,6 +452,7 @@ contract Edubukesealer {
     }
 
     // This function is used to get institute ID
+
     function getinstituteID(address _witness) external view returns (uint256) {
         return (institute_ID[_witness]);
     }
@@ -472,6 +485,7 @@ contract Edubukesealer {
     }
 
     // This function is used to get student info.
+
     function getStudentInfo(
         address _studentAdd
     ) external view returns (student memory) {
